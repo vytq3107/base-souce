@@ -1,0 +1,7 @@
+packages:
+  - 'apps/*'
+  - 'libs/*'
+  - 'libs/core/*'
+  - 'libs/database/*'
+  - 'libs/infra/*'
+  - 'libs/shared/*'

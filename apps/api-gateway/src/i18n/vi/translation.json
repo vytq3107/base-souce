@@ -1,0 +1,23 @@
+{
+  "auth": {
+    "login_success": "Đăng nhập thành công",
+    "logout_success": "Đăng xuất thành công",
+    "invalid_credentials": "Tên đăng nhập hoặc mật khẩu không đúng",
+    "workspace_selected": "Đã chọn workspace thành công",
+    "not_workspace_member": "Bạn không phải là thành viên của workspace này",
+    "token_revoked": "Token đã bị thu hồi"
+  },
+  "validation": {
+    "required": "Trường này là bắt buộc",
+    "invalid_format": "Định dạng không hợp lệ",
+    "too_short": "Quá ngắn",
+    "too_long": "Quá dài"
+  },
+  "errors": {
+    "internal_server_error": "Lỗi máy chủ nội bộ",
+    "bad_request": "Yêu cầu không hợp lệ",
+    "unauthorized": "Chưa xác thực",
+    "forbidden": "Không có quyền truy cập",
+    "not_found": "Không tìm thấy"
+  }
+}
