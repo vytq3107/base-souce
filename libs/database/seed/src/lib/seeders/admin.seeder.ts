@@ -18,20 +18,25 @@ export async function seedAdminAccount(dataSource: DataSource): Promise<void> {
     // Create profile
     const profile = profileRepository.create({
       fullName: 'Administrator',
-      avatar: null,
+      avatar: null
     });
     await profileRepository.save(profile);
 
     // Create account
-    const hashedPassword = await bcrypt.hash('Admin@123456', 10);
+    const hashedPassword = await bcrypt.hash('Pass123@', 10);
     const account = accountRepository.create({
       username: 'admin',
       password: hashedPassword,
       profileId: profile.id,
       roleId: adminRole.id,
-      isActive: true,
+      isActive: true
     });
     await accountRepository.save(account);
-    console.log(`✓ Created admin account: admin / Admin@123456`);
+    console.log(`✓ Created admin account: admin / Pass123@`);
+  } else {
+    // Update password to ensure it's what we expect
+    existingAdmin.password = await bcrypt.hash('Pass123@', 10);
+    await accountRepository.save(existingAdmin);
+    console.log(`✓ Updated admin password: admin / Pass123@`);
   }
 }

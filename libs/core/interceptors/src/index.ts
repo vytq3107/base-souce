@@ -1,1 +1,1 @@
-export * from './lib/interceptors/transform.interceptor';
+export * from './lib';

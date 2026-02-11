@@ -1,1 +1,1 @@
-export * from './lib/data-source.config';
+export * from './lib';

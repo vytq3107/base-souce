@@ -1,6 +1,6 @@
-import { Controller, Post, Body, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { AuthService } from '@support-center/data-access';
+import { AuthAbstractService } from '@support-center/core/abstracts';
 import { LoginDto, SelectWorkspaceDto } from '@support-center/core/dtos';
 import { JwtAuthGuard } from '@support-center/core/guards';
 import { User } from '@support-center/core/decorators';
@@ -8,7 +8,7 @@ import { User } from '@support-center/core/decorators';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthAbstractService) {}
 
   @Post('login')
   @ApiOperation({ summary: 'Login with username and password' })
@@ -22,10 +22,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Select a workspace to work in' })
   @HttpCode(HttpStatus.OK)
-  async selectWorkspace(
-    @User('sub') accountId: string,
-    @Body() selectWorkspaceDto: SelectWorkspaceDto
-  ) {
+  async selectWorkspace(@User('sub') accountId: string, @Body() selectWorkspaceDto: SelectWorkspaceDto) {
     return this.authService.selectWorkspace(accountId, selectWorkspaceDto);
   }
 

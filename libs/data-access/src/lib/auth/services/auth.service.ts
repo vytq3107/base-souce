@@ -1,20 +1,23 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcryptjs'
+import * as bcrypt from 'bcryptjs';
 import { AuthRepository } from '../repositories/auth.repository';
 import { LoginDto, SelectWorkspaceDto } from '@support-center/core/dtos';
-import { WorkspaceMember, Account } from '@support-center/database/entities';
+import { WorkspaceMember, Account, Workspace } from '@support-center/database/entities';
 import { DataSource } from 'typeorm';
+import { AuthAbstractService } from '@support-center/core/abstracts';
 
 @Injectable()
-export class AuthService {
+export class AuthService extends AuthAbstractService {
   constructor(
     private authRepository: AuthRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
-    private dataSource: DataSource,
-  ) {}
+    private dataSource: DataSource
+  ) {
+    super(authRepository);
+  }
 
   async login(loginDto: LoginDto) {
     const account = await this.authRepository.findAccountByUsername(loginDto.username);
@@ -23,22 +26,22 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { 
-      sub: account.id, 
+    const payload = {
+      sub: account.id,
       username: account.username,
       role: account.role.code,
       profileId: account.profileId
     };
 
     const accessToken = this.jwtService.sign(payload);
-    const refreshTokenValue = this.jwtService.sign(payload, { 
-      expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION', '7d') 
+    const refreshTokenValue = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION', '7d')
     });
 
     await this.authRepository.createRefreshToken({
       accountId: account.id,
       value: refreshTokenValue, // Should hash in real app
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     });
 
     return {
@@ -48,7 +51,7 @@ export class AuthService {
         id: account.id,
         username: account.username,
         fullName: account.profile.fullName,
-        role: account.role.code,
+        role: account.role.code
       }
     };
   }
@@ -56,7 +59,7 @@ export class AuthService {
   async selectWorkspace(accountId: string, selectWorkspaceDto: SelectWorkspaceDto) {
     const member = await this.dataSource.getRepository(WorkspaceMember).findOne({
       where: { accountId, workspaceId: selectWorkspaceDto.workspaceId },
-      relations: ['workspace'],
+      relations: ['workspace']
     });
 
     if (!member) {
@@ -64,12 +67,15 @@ export class AuthService {
     }
 
     // Usually we issue a new token with workspace context
-    const account = await this.authRepository.findAccountByUsername(
-      (await this.dataSource.getRepository(Account).findOneBy({ id: accountId })).username
-    );
+    const accountEntity = await this.dataSource.getRepository(Account).findOneBy({ id: accountId });
+    if (!accountEntity) {
+      throw new BadRequestException('Account not found');
+    }
 
-    const payload = { 
-      sub: accountId, 
+    const account = await this.authRepository.findAccountByUsername(accountEntity.username);
+
+    const payload = {
+      sub: accountId,
       username: account.username,
       role: account.role.code,
       workspaceId: selectWorkspaceDto.workspaceId,
@@ -78,7 +84,7 @@ export class AuthService {
 
     return {
       accessToken: this.jwtService.sign(payload),
-      workspace: member.workspace,
+      workspace: member.workspace
     };
   }
 

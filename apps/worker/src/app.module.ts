@@ -7,7 +7,11 @@ import { ScheduleModule } from '@nestjs/schedule';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV || ' development'}`,
+      envFilePath: [
+        `.env.${process.env.NODE_ENV || 'development'}`,
+        `apps/worker/.env.${process.env.NODE_ENV || 'development'}`,
+        '.env'
+      ]
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -18,11 +22,11 @@ import { ScheduleModule } from '@nestjs/schedule';
       database: process.env.DB_DATABASE,
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: process.env.DB_SYNC === 'true',
-      logging: process.env.DB_LOGGING === 'true',
+      logging: process.env.DB_LOGGING === 'true'
     }),
-    ScheduleModule.forRoot(),
+    ScheduleModule.forRoot()
   ],
   controllers: [],
-  providers: [],
+  providers: []
 })
 export class AppModule {}
