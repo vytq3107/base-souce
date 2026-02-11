@@ -22,7 +22,7 @@ export const dataSourceOptions: DataSourceOptions = {
   migrations: TYPEORM_MIGRATIONS,
   subscribers: TYPEORM_SUBSCRIBERS,
   synchronize: dbConfig.synchronize,
-  logging: dbConfig.logging,
+  logging: dbConfig.logging
 };
 
 export const AppDataSource = new DataSource(dataSourceOptions);
