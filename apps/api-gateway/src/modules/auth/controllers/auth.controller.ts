@@ -1,7 +1,7 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Get, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthAbstractService } from '@support-center/core/abstracts';
-import { LoginDto, SelectWorkspaceDto } from '@support-center/core/dtos';
+import { LoginDto, PaginationQueryDto, SelectWorkspaceDto } from '@support-center/core/dtos';
 import { JwtAuthGuard } from '@support-center/core/guards';
 import { User } from '@support-center/core/decorators';
 
@@ -33,5 +33,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async logout(@User('sub') accountId: string) {
     return this.authService.logout(accountId);
+  }
+  // test phan trang
+  @Get('accounts')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get paginated account list' })
+  async getAccounts(@Query() paginationQuery: PaginationQueryDto) {
+    return this.authService.getAccounts(paginationQuery);
   }
 }
