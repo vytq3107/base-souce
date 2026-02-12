@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
 import { AuthRepository } from '../repositories/auth.repository';
-import { LoginDto, SelectWorkspaceDto } from '@support-center/core/dtos';
+import { LoginDto, PaginatedResponseDto, PaginationQueryDto, SelectWorkspaceDto } from '@support-center/core/dtos';
 import { WorkspaceMember, Account, Workspace } from '@support-center/database/entities';
 import { DataSource } from 'typeorm';
 import { AuthAbstractService } from '@support-center/core/abstracts';
@@ -91,5 +91,10 @@ export class AuthService extends AuthAbstractService {
   async logout(accountId: string) {
     await this.authRepository.revokeRefreshToken(accountId);
     return { success: true };
+  }
+
+  //test phan trang, cos the xoas
+  async getAccounts(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<Account>> {
+    return this.authRepository.findAccountsWithPagination(paginationQuery);
   }
 }
